@@ -20,16 +20,21 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/controller"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/crossplane/provider-template/internal/controller/config"
-	"github.com/crossplane/provider-template/internal/controller/mytype"
+	"github.com/crossplane/provider-awcatorprovider/internal/controller/awcatorkind1"
+	"github.com/crossplane/provider-awcatorprovider/internal/controller/awcatorkind2"
+	"github.com/crossplane/provider-awcatorprovider/internal/controller/config"
 )
 
-// Setup creates all Template controllers with the supplied logger and adds them to
+/**
+Register controllers in controller side
+*/
+// Setup creates all AwcatorProvider controllers with the supplied logger and adds them to
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
 		config.Setup,
-		mytype.Setup,
+		awcatorkind1.Setup,
+		awcatorkind2.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err

@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package v1alpha1 contains the core resources of the AwcatorProvider provider.
+// Package v1alpha1 contains the v1alpha1 group Sample resources of the AwcatorProvider provider.
 // +kubebuilder:object:generate=true
-// +groupName=awcatorprovider.crossplane.io
+// +groupName=awcatorgroup1.awcatorprovider.crossplane.io
 // +versionName=v1alpha1
 package v1alpha1
 
@@ -27,7 +27,7 @@ import (
 
 // Package type metadata.
 const (
-	Group   = "awcatorprovider.crossplane.io"
+	Group   = "awcatorgroup1.awcatorprovider.crossplane.io"
 	Version = "v1alpha1"
 )
 

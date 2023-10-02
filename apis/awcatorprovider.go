@@ -14,21 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package apis contains Kubernetes API for the Template provider.
+// Package apis contains Kubernetes API for the AwcatorProvider provider.
 package apis
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 
-	samplev1alpha1 "github.com/crossplane/provider-template/apis/sample/v1alpha1"
-	templatev1alpha1 "github.com/crossplane/provider-template/apis/v1alpha1"
+	awcatorgroup1v1alpha1 "github.com/crossplane/provider-awcatorprovider/apis/awcatorgroup1/v1alpha1"
+	awcatorgroup2passv1alpha1 "github.com/crossplane/provider-awcatorprovider/apis/awcatorgroup2pass/v1alpha1"
+	awcatorproviderv1alpha1 "github.com/crossplane/provider-awcatorprovider/apis/v1alpha1"
 )
 
+/*
+*
+Register API in API directory
+*/
 func init() {
 	// Register the types with the Scheme so the components can map objects to GroupVersionKinds and back
 	AddToSchemes = append(AddToSchemes,
-		templatev1alpha1.SchemeBuilder.AddToScheme,
-		samplev1alpha1.SchemeBuilder.AddToScheme,
+		awcatorproviderv1alpha1.SchemeBuilder.AddToScheme,
+		awcatorgroup1v1alpha1.SchemeBuilder.AddToScheme,
+		awcatorgroup2passv1alpha1.SchemeBuilder.AddToScheme,
 	)
 }
 
