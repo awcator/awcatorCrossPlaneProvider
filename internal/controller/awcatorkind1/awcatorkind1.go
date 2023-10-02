@@ -149,14 +149,17 @@ type external struct {
 	service *awcatorLoginService
 }
 
+var k = 0
+
 func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
-	fmt.Println("------------>Inside Observe()")
+	fmt.Println("------------>Inside Observe()", k)
+	k++
 	cr, ok := mg.(*v1alpha1.AwcatorKind1)
 	if !ok {
 		return managed.ExternalObservation{}, errors.New(errNotAwcatorKind1)
 	}
 
-	if isTrue == false {
+	if k < 10 {
 		return managed.ExternalObservation{
 			ResourceExists: false,
 		}, nil
