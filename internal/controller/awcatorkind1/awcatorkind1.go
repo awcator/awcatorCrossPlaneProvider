@@ -19,6 +19,8 @@ package awcatorkind1
 import (
 	"context"
 	"fmt"
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/meta"
 
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -37,20 +39,32 @@ import (
 	"github.com/crossplane/provider-awcatorprovider/internal/features"
 )
 
+var isTrue bool = false
+
 const (
-	errNotAwcatorKind1    = "managed resource is not a AwcatorKind1 custom resource"
-	errTrackPCUsage = "cannot track ProviderConfig usage"
-	errGetPC        = "cannot get ProviderConfig"
-	errGetCreds     = "cannot get credentials"
+	errNotAwcatorKind1 = "managed resource is not a AwcatorKind1 custom resource"
+	errTrackPCUsage    = "cannot track ProviderConfig usage"
+	errGetPC           = "cannot get ProviderConfig"
+	errGetCreds        = "cannot get credentials"
 
 	errNewClient = "cannot create new Service"
 )
 
 // A NoOpService does nothing.
-type NoOpService struct{}
+type awcatorLoginService struct {
+	awcatorCli *awcatorHttpClinet
+}
 
 var (
-	newNoOpService = func(_ []byte) (interface{}, error) { return &NoOpService{}, nil }
+	newawcatorLoginService = func(creds []byte) (*awcatorLoginService, error) {
+		fmt.Println("<---------awcator--->Recived Creds as ", string(creds))
+		secure_url := string(creds)
+		var cli awcatorHttpClinet
+		cli.url = secure_url
+		return &awcatorLoginService{
+			awcatorCli: &cli,
+		}, nil
+	}
 )
 
 // Setup adds a controller that reconciles AwcatorKind1 managed resources.
@@ -67,7 +81,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		managed.WithExternalConnecter(&connector{
 			kube:         mgr.GetClient(),
 			usage:        resource.NewProviderConfigUsageTracker(mgr.GetClient(), &apisv1alpha1.ProviderConfigUsage{}),
-			newServiceFn: newNoOpService}),
+			newServiceFn: newawcatorLoginService}),
 		managed.WithLogger(o.Logger.WithValues("controller", name)),
 		managed.WithPollInterval(o.PollInterval),
 		managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))),
@@ -86,7 +100,11 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 type connector struct {
 	kube         client.Client
 	usage        resource.Tracker
-	newServiceFn func(creds []byte) (interface{}, error)
+	newServiceFn func(creds []byte) (*awcatorLoginService, error)
+}
+
+type awcatorHttpClinet struct {
+	url string
 }
 
 // Connect typically produces an ExternalClient by:
@@ -128,15 +146,23 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 type external struct {
 	// A 'client' used to connect to the external resource API. In practice this
 	// would be something like an AWS SDK client.
-	service interface{}
+	service *awcatorLoginService
 }
 
 func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
+	fmt.Println("------------>Inside Observe()")
 	cr, ok := mg.(*v1alpha1.AwcatorKind1)
 	if !ok {
 		return managed.ExternalObservation{}, errors.New(errNotAwcatorKind1)
 	}
 
+	if isTrue == false {
+		return managed.ExternalObservation{
+			ResourceExists: false,
+		}, nil
+	}
+
+	cr.Status.SetConditions(xpv1.Available())
 	// These fmt statements should be removed in the real implementation.
 	fmt.Printf("Observing: %+v", cr)
 
@@ -158,13 +184,23 @@ func (c *external) Observe(ctx context.Context, mg resource.Managed) (managed.Ex
 }
 
 func (c *external) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
-	cr, ok := mg.(*v1alpha1.AwcatorKind1)
+	fmt.Println("------------>Inside Creatte()")
+	cr, ok := mg.(*v1alpha1.AwcatorKind1) //cr is custom reosurce
 	if !ok {
 		return managed.ExternalCreation{}, errors.New(errNotAwcatorKind1)
 	}
-
+	fmt.Println("awcator: Createing resource at" + c.service.awcatorCli.url)
 	fmt.Printf("Creating: %+v", cr)
-
+	city := "UnsetCITY"
+	if cr.Spec.ForProvider.City != nil {
+		city = *cr.Spec.ForProvider.City
+	}
+	//fmt.Printf("With Country: ", cr.Spec.ForProvider.Country)
+	fmt.Printf("With UserName: ", cr.Spec.ForProvider.UserName)
+	fmt.Println("With the resourceNmae", meta.GetExternalName(cr))
+	fmt.Println("CityyName", city)
+	cr.Status.AtProvider.State = "Creating......"
+	isTrue = true
 	return managed.ExternalCreation{
 		// Optionally return any details that may be required to connect to the
 		// external resource. These will be stored as the connection secret.

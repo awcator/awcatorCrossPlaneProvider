@@ -1,0 +1,11 @@
+apiVersion: awcatorgroup1.awcatorprovider.crossplane.io/v1alpha1
+kind: AwcatorKind1
+metadata:
+  name: example
+spec:
+  forProvider:
+    UserName: "casda"
+    Message: "casr"
+    configurableField: "test"
+  providerConfigRef:
+    name: example

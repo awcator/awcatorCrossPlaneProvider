@@ -68,9 +68,17 @@ spec:
                 description: AwcatorKind1Parameters are the configurable fields of
                   a AwcatorKind1.
                 properties:
+                  City:
+                    type: string
+                  Message:
+                    type: string
+                  UserName:
+                    type: string
                   configurableField:
                     type: string
                 required:
+                - Message
+                - UserName
                 - configurableField
                 type: object
               managementPolicies:
@@ -279,6 +287,10 @@ spec:
                 properties:
                   observableField:
                     type: string
+                  state:
+                    type: string
+                required:
+                - state
                 type: object
               conditions:
                 description: Conditions of the resource.

@@ -27,11 +27,18 @@ import (
 
 // AwcatorKind1Parameters are the configurable fields of a AwcatorKind1.
 type AwcatorKind1Parameters struct {
-	ConfigurableField string `json:"configurableField"`
+
+	// +optional
+	City              *string `json:"City,omitempty"`
+	UserName          string  `json:"UserName"`
+	Message           string  `json:"Message"`
+	ConfigurableField string  `json:"configurableField"`
 }
 
 // AwcatorKind1Observation are the observable fields of a AwcatorKind1.
 type AwcatorKind1Observation struct {
+	State           string `json:"state"`
+	responseMsg     string `json:"state"`
 	ObservableField string `json:"observableField,omitempty"`
 }
 
