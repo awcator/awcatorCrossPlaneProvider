@@ -1,0 +1,41 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: higherdatabases.highercustom-api.example.org
+spec:
+  group: highercustom-api.example.org
+  names:
+    kind: higherdatabase
+    plural: higherdatabases
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                awcatorTag:
+                  type: string
+                region:
+                  type: string
+                  oneOf:
+                    - pattern: '^EU$'
+                    - pattern: '^US$'
+              required:
+                - region
+                - awcatorTag
+            status:
+              description: "HIGHER DETAILS"
+              type: object
+              properties:
+                final_output:
+                  default: "OUTPUT"
+                  type: string
+                  description: "OUTPUT ONLY"
+  claimNames:
+    kind: higher-custom-database
+    plural: higher-custom-databases

@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2023-09-21T14:52:12Z"
+  generation: 1
+  name: provider-kubernetes-fd7ab5be249e
+  namespace: crossplane-system
+  ownerReferences:
+  - apiVersion: pkg.crossplane.io/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ProviderRevision
+    name: provider-kubernetes-fd7ab5be249e
+    uid: 826838cf-6422-4506-811e-3ca16a68ae65
+  resourceVersion: "143819"
+  uid: c332a0a2-745a-4e74-b056-f7444ee27b5e
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      pkg.crossplane.io/provider: provider-kubernetes
+      pkg.crossplane.io/revision: provider-kubernetes-fd7ab5be249e
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        pkg.crossplane.io/provider: provider-kubernetes
+        pkg.crossplane.io/revision: provider-kubernetes-fd7ab5be249e
+      name: provider-kubernetes
+      namespace: crossplane-system
+    spec:
+      containers:
+      - env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: WEBHOOK_TLS_CERT_DIR
+          value: /webhook/tls
+        image: xpkg.upbound.io/crossplane-contrib/provider-kubernetes:v0.9.0
+        imagePullPolicy: IfNotPresent
+        name: provider-kubernetes
+        ports:
+        - containerPort: 8080
+          name: metrics
+          protocol: TCP
+        - containerPort: 9443
+          name: webhook
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /webhook/tls
+          name: webhook-tls-secret
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccount: provider-kubernetes-fd7ab5be249e
+      serviceAccountName: provider-kubernetes-fd7ab5be249e
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: webhook-tls-secret
+        secret:
+          defaultMode: 420
+          items:
+          - key: tls.crt
+            path: tls.crt
+          - key: tls.key
+            path: tls.key
+          secretName: webhook-tls-secret
+status:
+  conditions:
+  - lastTransitionTime: "2023-09-21T14:52:13Z"
+    lastUpdateTime: "2023-09-21T14:52:13Z"
+    message: Deployment does not have minimum availability.
+    reason: MinimumReplicasUnavailable
+    status: "False"
+    type: Available
+  - lastTransitionTime: "2023-09-21T14:52:12Z"
+    lastUpdateTime: "2023-09-21T14:52:14Z"
+    message: ReplicaSet "provider-kubernetes-fd7ab5be249e-55f56d7846" is progressing.
+    reason: ReplicaSetUpdated
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  replicas: 1
+  unavailableReplicas: 1
+  updatedReplicas: 1

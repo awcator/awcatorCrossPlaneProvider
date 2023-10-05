@@ -1,0 +1,32 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: k8sworkercomposition
+spec:
+  compositeTypeRef:
+    apiVersion: custom-api.example.org/v1alpha1
+    kind: k8sawcator
+  resources:
+    - name: myconfigmap
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: sample-configmap
+        spec:
+          references:
+          - dependsOn:
+              apiVersion: custom-api.example.org/v1alpha1
+              kind: database
+              name: my-composite-resource
+          forProvider:
+            manifest:
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: my-configmap
+                namespace: default
+              data:
+                key1: value1
+          providerConfigRef:
+            name: kubernetes-provider

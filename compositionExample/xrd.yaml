@@ -1,0 +1,46 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: databases.custom-api.example.org
+spec:
+  group: custom-api.example.org
+  names:
+    kind: database
+    plural: databases
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                awcatorTag:
+                  type: string
+                region:
+                  type: string
+                  oneOf:
+                    - pattern: '^EU$'
+                    - pattern: '^US$'
+              # getting the values from claims
+              required:
+                - region
+                - awcatorTag
+            # Hardcoding the values if req
+            status:
+              description: "Log group status"
+              type: object
+              properties:
+                awcator:
+                  default: "AWCATOR"
+                  type: string
+                  description: "AWCATOR ONLY"
+                # a placeholder that will be filled by s3 ARN later. Just for testing
+                awcator_region:
+                  type: string
+  claimNames:
+    kind: custom-database
+    plural: custom-databases

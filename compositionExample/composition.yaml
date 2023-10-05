@@ -1,0 +1,79 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: dynamo-with-bucket
+spec:
+  compositeTypeRef:
+    apiVersion: custom-api.example.org/v1alpha1
+    kind: database
+  resources:
+    # S3
+    - name: s3Bucket
+      base:
+        apiVersion: s3.aws.upbound.io/v1beta1
+        kind: Bucket
+        metadata:
+          name: awcator-619
+          annotations:
+            crossplane.io/external-name: awcator-66619
+        spec:
+          dependsOn:
+            - dynamoDB
+          forProvider:
+            region: us-east-2
+          providerConfigRef:
+            name: default
+      patches:
+        - type: FromCompositeFieldPath
+          #fromFieldPath: status.awcator
+          fromFieldPath: spec.awcatorTag
+          toFieldPath: spec.forProvider.tags.awcator222
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.arn
+          toFieldPath: status.awcator_region
+    #DynamoDB
+    - name: dynamoDB
+      base:
+        apiVersion: dynamodb.aws.upbound.io/v1beta1
+        kind: Table
+        metadata:
+          name: crossplane-quickstart-database
+        spec:
+          forProvider:
+            region: "us-east-2"
+            writeCapacity: 1
+            readCapacity: 1
+            attribute:
+              - name: S3ID
+                type: S
+            hashKey: S3ID
+   #Configmap
+    - name: myconfigmap
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: sample-configmap2
+        spec:
+#          references:
+#          - dependsOn:
+#              apiVersion: s3.aws.upbound.io/v1beta1
+#              kind: Bucket
+#              name: s3Bucket
+          forProvider:
+            manifest:
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: my-configmap
+                namespace: default
+              data:
+                key1: value1
+          providerConfigRef:
+            name: kubernetes-provider
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.awcator_region
+          toFieldPath: spec.forProvider.manifest.data.key2
+          policy:
+            fromFieldPath: Required

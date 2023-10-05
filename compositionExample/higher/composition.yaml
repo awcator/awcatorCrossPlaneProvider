@@ -1,0 +1,31 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: higher-dynamo-with-bucket
+spec:
+  compositeTypeRef:
+    apiVersion: highercustom-api.example.org/v1alpha1
+    kind: higherdatabase
+  resources:
+    - name: nosqls
+      base:
+        apiVersion: custom-api.example.org/v1alpha1
+        kind: database
+        spec:
+          region: "US"
+          compositionRef:
+            name: dynamo-with-bucket
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.awcatorTag
+          toFieldPath: spec.awcatorTag
+
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.awcator_region #lower compostion (Resrouce)
+          toFieldPath: status.final_output     # higher composite variable
+
+        # worked for lowr, Renaming coposite
+        #- fromFieldPath: spec.awcatorTag
+        #  toFieldPath: metadata.name
+
+

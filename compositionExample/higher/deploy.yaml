@@ -1,0 +1,7 @@
+apiVersion: highercustom-api.example.org/v1alpha1
+kind: higherdatabase
+metadata:
+  name: awcaaaa
+spec:
+  region: "US"
+  awcatorTag: "awcaaaaa"

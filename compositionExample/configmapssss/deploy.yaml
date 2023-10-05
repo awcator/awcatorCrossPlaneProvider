@@ -1,0 +1,5 @@
+apiVersion: custom-api.example.org/v1alpha1
+kind: k8sawcator
+metadata:
+  name: my-k8sworkercomposite
+spec: {}
